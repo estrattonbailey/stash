@@ -1,0 +1,154 @@
+// TYPOGRAPHY
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,800italic,400,300,800);
+$font-stack__sans: "Open Sans", Helvetica, Arial, sans-serif;
+$font-stack__serif: georgia, serif;
+$font-stack__body: $font-stack__sans;
+$font-stack__headings: $font-stack__sans;
+
+html, body {
+	color: #222222;
+	font-family: $font-stack__body;
+	font-size: 62.5%;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+}
+.font-sans {
+	font-family: $font-stack__sans;
+}
+.font-serif {
+	font-family: $font-stack__serif;
+}
+.font-monospace {
+	font-family: Consolas , Monaco, monospace;
+}
+h1, h2, h3, h4, h5, h6, p {
+	font-weight: 100;
+	margin: 0;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family: $font-stack__headings;
+}
+h1,
+.f1 {
+	font-size: 3.2rem;
+	line-height: 1.1;
+	@media screen and (min-width: break($_s)) {
+		font-size: 4.5rem;
+	}
+}
+h2,
+.f2 {
+	font-size: 2.5rem;
+	line-height: 1.4;
+	@media screen and (min-width: break($_s)) {
+		font-size: 3rem;
+	}
+}
+h3,
+.f3 {
+	font-size: 2rem;
+	line-height: 1.4;
+	@media screen and (min-width: break($_s)) {
+		font-size: 2.2rem;
+	}
+}
+h4,
+.f4 {
+	font-size: 1.8rem;
+	line-height: 1.5;
+}
+h5,
+.f5 {
+	font-size: 1.5rem;
+	line-height: 1.6;
+}
+h6,
+.f6 {
+	font-size: 1.2rem;
+	line-height: 1.6;
+}
+p,
+.p {
+	font-size: 1.8rem;
+	font-weight: 100;
+	line-height: 1.7;
+}
+blockquote {
+	@extend .f2;
+	margin: 3rem 0;
+	padding-left: 2rem;
+	border-left: 4px solid #148ECC;
+
+	@media (min-width: 48em){ // 768px
+		padding-left: 3rem;
+	}
+
+	h1, h2, h3, h4, h5, h6, p {
+		@extend .f2;
+	}
+}
+hr {
+	@extend .block-relative;
+	background-color: #f5f5f5;
+	border: 0;
+	height: 2px;
+	width: 100px;
+}
+a {
+	text-decoration: none;
+}
+
+// For rich text content, to add spacing
+// between typographical elements.
+.text-content {
+  h1, h2, h3, h4, h5, h6,
+  .f1, .f2, .f3, .f4, .f5, .f6 {
+    margin: 1ex 0 .6ex;
+  }
+  p {
+    margin: 2ex 0;
+  }
+}
+
+// STYLES
+// Pare these down based on your available fonts
+.font-0 {
+  margin: 0;
+  line-height: 1;
+}
+.font-s-i {
+	font-style: italic;
+}
+.font-w-1 {
+	font-weight: 100;
+}
+.font-w-2 {
+	font-weight: 200;
+}
+.font-w-3 {
+	font-weight: 300;
+}
+.font-w-4 {
+	font-weight: 400;
+}
+.font-w-5 {
+	font-weight: 500;
+}
+.font-w-6 {
+	font-weight: 600;
+}
+.font-w-7 {
+	font-weight: 700;
+}
+.font-w-8 {
+	font-weight: 800;
+}
+.font-w-9 {
+	font-weight: 900;
+}
+.font-t-u {
+	text-transform: uppercase;
+}
+.font-d-u {
+	text-decoration: underline;
+}

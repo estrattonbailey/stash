@@ -1,0 +1,22 @@
+// BUTTONS
+.button,
+button {
+	@extend .inline-relative;
+	background-color: #148ECC;
+	border: 0;
+	color: inherit;
+	cursor: pointer;
+	padding: .4em 1.5em;
+	text-decoration: none;
+	text-align: center;
+	-webkit-appearance: none;
+}
+.button--border {
+	@extend .button;
+	background-color: transparent;
+	border: 1px solid #148ECC;
+	color: inherit;
+}
+input[type="submit"] {
+	@extend .button;
+}
