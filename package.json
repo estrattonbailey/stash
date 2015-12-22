@@ -22,9 +22,11 @@
   },
   "dependencies": {
     "common-js-pub-sub": "^1.0.4",
+    "highlight.js": "^9.0.0",
     "marked": "^0.3.5",
     "svbstrate": "^0.5.3",
     "throttly": "^1.0.4",
+    "time-uuid": "^1.0.0",
     "velocity-animate": "^1.2.3"
   }
 }
