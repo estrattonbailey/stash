@@ -1,0 +1,42 @@
+.nav {
+  top: 0; left: 0;
+  z-index: 9;
+  opacity: 0;
+  transition: opacity 0.3s;
+
+  &[role="main"]{
+    z-index: 10;
+    opacity: 1;
+  }
+
+  .panel.is-active & {
+    opacity: 1; 
+  }
+}
+.nav__button {
+  height: 60px;
+  width: 60px;
+}
+
+.new {
+  margin-top: 10px;
+  height: 40px; 
+  width: 40px; 
+  border-radius: 100%;
+
+  .__icon {
+    &::before, &::after {
+      content:'';
+      display: block;
+      position: absolute;
+      height: 15px;
+      width: 3px;
+      background-color: white;
+      top: ((40px - 15px)/2);
+      left: ((40px - 3px)/2);
+    } 
+    &::after {
+      transform: rotate(90deg);
+    }
+  }
+}

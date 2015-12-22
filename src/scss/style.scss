@@ -11,9 +11,10 @@
 @import "base/align";
 @import "base/floats";
 @import "base/spacing";
-
 // Elements
 @import "elements/_init";
 
-// Components
-@import "components/_init";
+// Partials 
+@import "partials/app";
+@import "partials/nav";
+@import "partials/panels";

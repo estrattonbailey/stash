@@ -17,6 +17,9 @@ button {
 	border: 1px solid #148ECC;
 	color: inherit;
 }
+.button--ghost {
+  background-color: rgba($c-theme, 0); 
+}
 input[type="submit"] {
 	@extend .button;
 }

@@ -44,23 +44,30 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ajax = __webpack_require__(1);
+	var DOM = __webpack_require__(1);
 
 	jQuery(function ($) {
-	  const Hello = "Hello World!";
-	  console.log(Hello);
-	  ajax.sayHello();
+	  new DOM();
 	});
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-	module.exports = {
-	  sayHello: function () {
-	    console.log("Hello World 2!");
-	  }
+	function General() {
+	  this.panels = $('[data-panel]');
+
+	  // BINDINGS
+	  this.panels.on('click', this.setActivePanel);
+	}
+
+	General.prototype.setActivePanel = function (e) {
+	  var target = $(e.currentTarget);
+	  $('[data-panel]').removeClass('is-active');
+	  target.addClass('is-active');
 	};
+
+	module.exports = General;
 
 /***/ }
 /******/ ]);

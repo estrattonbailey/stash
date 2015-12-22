@@ -1,9 +1,11 @@
-<section class="editor js-editor">
-  <!-- Insert header icons here -->
+<section class="panel w1 absolute is-active" data-panel="editor">
+  <div class="panel__inner relative">
 
-  <div class="editor__inner">
-    <div class="editor__content js-editor-content" contenteditable="true">
-      Begin by typing something here...
-    </div>
+    <nav class="nav absolute px-20 align-r w1" role="editor">
+      <button class="new nav__button align-m js-newDoc"><span class="js-icon __icon"></span></button>
+    </nav>
+
+    <textarea class="editor js-content relative p h1 font-monospace">Begin by typing something here...</textarea>
+
   </div>
 </section>

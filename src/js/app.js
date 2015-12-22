@@ -1,7 +1,5 @@
-var ajax = require('./data/ajax.js');
+var DOM = require('./_util/dom.js');
 
 jQuery(function($){
-  const Hello = "Hello World!";
-  console.log(Hello);
-  ajax.sayHello();
+  new DOM();
 });
