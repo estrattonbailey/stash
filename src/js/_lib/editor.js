@@ -3,7 +3,7 @@ var throttle = require('throttly');
 function Editor(){
   const editor = $('.js-editor');
 
-  editor.on('keyup', throttle(this.getData,50));
+  editor.on('keyup', throttle(this.getData, 50));
 }
 
 Editor.prototype.getData = function(e){
