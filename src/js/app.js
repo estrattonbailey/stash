@@ -1,13 +1,16 @@
+window.events = require('common-js-pub-sub')();;
+window.stash = {};
+
+// Util
 const DOM = require('./_util/dom.js');
-const Editor = require('./_lib/editor.js');
-const View = require('./_lib/view.js');
-const Markdown = require('./_util/markdown.js');
-const E = require('common-js-pub-sub')();
-window.events = E;
+const Storage = require('./_util/storage');
+
+// Lib
+const Doc = require('./_lib/doc.js');
 
 jQuery(function($){
   new DOM();
-  new Editor();
-  new Markdown();
-  new View();
+
+  new Storage();
+  new Doc();
 });
