@@ -44,25 +44,55 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	window.events = __webpack_require__(1)();;
-	window.stash = {};
+	__webpack_require__(1);
 
-	// Util
-	const DOM = __webpack_require__(2);
 	const Storage = __webpack_require__(3);
-
-	// Lib
-	const Doc = __webpack_require__(4);
+	const Model = __webpack_require__(4);
+	const View = __webpack_require__(5);
+	const Controller = __webpack_require__(6);
 
 	jQuery(function ($) {
-	  new DOM();
 
-	  new Storage();
-	  new Doc();
+	  window.stash = window.stash || {};
+
+	  function Stash() {
+	    this.storage = new Storage();
+	    this.model = new Model(this.storage);
+	    this.view = new View();
+	    this.controller = new Controller(this.model, this.view);
+	  }
+
+	  const stash = new Stash();
+
+	  _e.publish('stash.setView');
 	});
 
 /***/ },
 /* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = (function () {
+	  window._e = __webpack_require__(2)();
+
+	  window._s = function (selector, scope) {
+	    return (scope || document).querySelector(selector);
+	  };
+
+	  window._sa = function (selector, scope) {
+	    return (scope || document).querySelectorAll(selector);
+	  };
+
+	  window._on = function (scope, event, callback, useCapture) {
+	    _s(scope).addEventListener(event, callback, !!useCapture);
+	  };
+
+	  window._str = function (data) {
+	    return JSON.stringify(data);
+	  };
+	})();
+
+/***/ },
+/* 2 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -131,92 +161,133 @@
 	    };
 	}
 
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	function General() {
-	  this.panels = $('[data-panel]');
-
-	  // BINDINGS
-	  this.panels.on('click', this.setActivePanel);
-	}
-
-	General.prototype.setActivePanel = function (e) {
-	  var target = $(e.currentTarget);
-	  $('[data-panel]').removeClass('is-active');
-	  target.addClass('is-active');
-	};
-
-	module.exports = General;
 
 /***/ },
 /* 3 */
 /***/ function(module, exports) {
 
 	function Storage() {
-	  if (this.hasData()) {
-	    window.stash = this.getData();
-	  } else {
-	    window.stash = {
-	      user: 'estrattonbailey',
-	      docs: []
-	    };
-	    this.setData();
-	  }
+	  var def = {
+	    user: 'estrattonbailey',
+	    docs: []
+	  };
+	  window.stash.storage = window.stash.storage || def;
+	  this.setData();
 	}
-	Storage.prototype.hasData = function () {
+	/**
+	 * Get all stash data
+	 */
+	Storage.prototype.getData = function () {
 	  return localStorage.getItem('stash_data') ? true : false;
 	};
-	Storage.prototype.str = function (data) {
-	  return JSON.stringify(data);
-	};
-	Storage.prototype.getData = function () {
-	  return JSON.parse(localStorage.getItem('stash_data'));
-	};
+	/**
+	 * Save all stash data
+	 */
 	Storage.prototype.setData = function () {
-	  localStorage.setItem('stash_data', this.str(stash));
+	  localStorage.setItem('stash_data', _str(this.storage));
+	  console.log("Stash data saved.");
 	};
+	/**
+	 * Save/create individual doc
+	 */
+	Storage.prototype.save = function (data) {
+	  if (data.id) {
+	    console.log("Saving a doc with an ID provided.");
+	    this.storage.docs.forEach(function (doc, i) {
+	      if (this.storage.docs[i].id === id) {
+	        for (var key in data) {
+	          this.storage.docs[i][key] = data[key];
+	        }
+	      }
+	    });
+	  } else {
+	    data.id = new Date().getTime();
+
+	    console.log("Saving a doc without an ID provided.");
+	    window.stash.storage.docs.push(data);
+	    this.setData();
+	  }
+	};
+	Storage.prototype.remove = function (id) {};
 
 	module.exports = Storage;
 
 /***/ },
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	var uuid = __webpack_require__(5);
-	var Storage = __webpack_require__(3);
-
-	function Doc() {
-	  if (!Storage.hasData) {}
-
-	  stash.doc = this.ID = uuid();
+	function Model(storage) {
+	  this.storage_docs = storage.docs;
+	  this.storage = Object.getPrototypeOf(storage);
 	}
+	/**
+	 * Create a new blank doc
+	 */
+	Model.prototype.create = function () {
+	  var doc = {};
+	  doc.content = '';
 
-	module.exports = Doc;
+	  this.storage.save(doc);
+	  _e.publish('stash.create', doc.content);
+	};
+	Model.prototype.read = function () {};
+	/**
+	 * Save a document
+	 * @param {string} content The plain text content of the editor textarea 
+	 * @param {integer} id The id of the doc to save (optional)
+	 */
+	Model.prototype.save = function (content, id) {
+	  var doc = {};
+	  doc.content = content;
+
+	  if (id) {
+	    doc.id = id;
+	  }
+
+	  this.storage.save(doc, id);
+	};
+
+	module.exports = Model;
 
 /***/ },
 /* 5 */
 /***/ function(module, exports) {
 
-	'use strict';
+	function View() {
+	  this.view = _s('.js-view');
 
-	// To make id smaller we get microseconds count from more recent date
-	var start = Date.UTC(2012, 12, 21, 12, 0, 0, 0) * 1000
+	  _e.subscribe('stash.create', this.updateView.bind(this));
+	  _e.subscribe('dom.openPreview', this.openPreview.bind(this));
+	}
 
-	// Prefix with number, it reduces chances of collision with variable names
-	// (helpful if used as property names on objects)
-	  , prefix = String(Math.floor(Math.random() * 10))
-
-	// Make it more unique
-	  , postfix = Math.floor(Math.random() * 36).toString(36)
-
-	  , abs = Math.abs;
-
-	module.exports = function (time) {
-		return prefix + abs(time - start).toString(36) + postfix;
+	View.prototype.updateView = function (content) {
+	  this.view.innerHTML = content;
+	};
+	View.prototype.openPreview = function () {
+	  console.log("View");
 	};
 
+	module.exports = View;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	function Controller(model, view) {
+	  const _ = this;
+	  _.model = model;
+	  _.view = view;
+
+	  // Bindings
+	  _on('.js-view', 'click', _e.publish('dom.openPreview'));
+
+	  // Subscribers
+	  _e.subscribe('stash.setView', function () {
+	    _.model.create();
+	  });
+	}
+
+	module.exports = Controller;
 
 /***/ }
 /******/ ]);
