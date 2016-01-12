@@ -6,6 +6,7 @@ function View(){
   _e.subscribe('stash.create', this.updateView.bind(this));
   _e.subscribe('dom.togglePanels', this.togglePanels.bind(this));
   _e.subscribe('editor.typing', this.convertToMd.bind(this));
+  _e.subscribe('dom.new', this.newModal.bind(this));
 }
 
 View.prototype.updateView = function(content){
@@ -22,6 +23,9 @@ View.prototype.togglePanels = function(e){
 }
 View.prototype.convertToMd = function(e){
   this.view.innerHTML = marked(e.target.value);
+}
+View.prototype.newModal = function(){
+  
 }
 
 module.exports = View;

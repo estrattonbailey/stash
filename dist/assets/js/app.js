@@ -367,6 +367,7 @@
 	  _e.subscribe('stash.create', this.updateView.bind(this));
 	  _e.subscribe('dom.togglePanels', this.togglePanels.bind(this));
 	  _e.subscribe('editor.typing', this.convertToMd.bind(this));
+	  _e.subscribe('dom.new', this.newModal.bind(this));
 	}
 
 	View.prototype.updateView = function (content) {
@@ -384,6 +385,7 @@
 	View.prototype.convertToMd = function (e) {
 	  this.view.innerHTML = marked(e.target.value);
 	};
+	View.prototype.newModal = function () {};
 
 	module.exports = View;
 
@@ -1699,8 +1701,10 @@
 	    _e.publish('editor.typing', e);
 	  }, 50), false);
 
+	  _on('.js-new', 'click', _e.publish('dom.new'), false);
+
 	  // Subscribers
-	  _e.subscribe('stash.setView', function () {
+	  _e.subscribe('doc.new', function () {
 	    _.model.create();
 	  });
 	}

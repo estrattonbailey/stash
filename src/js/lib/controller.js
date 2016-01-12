@@ -14,8 +14,10 @@ function Controller(model, view){
       _e.publish('editor.typing', e)
   }, 50), false);
 
+  _on('.js-new', 'click', _e.publish('dom.new'), false);
+
   // Subscribers
-  _e.subscribe('stash.setView', function(){
+  _e.subscribe('doc.new', function(){
     _.model.create();
   });
 }
