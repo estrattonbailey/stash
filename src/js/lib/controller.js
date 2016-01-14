@@ -5,21 +5,29 @@ function Controller(model, view){
   _.model = model; 
   _.view = view; 
 
+  // Subscribers
+  _e.subscribe('stash.init', function(){
+    _.model.get()
+  });
+  _e.subscribe('stash.new', function(){
+    _.model.create()
+  });
+
   // Bindings
   _on('.js-panel', 'click', function(e){
     _e.publish('dom.togglePanels', e);
   }, false);
 
   _on('.js-editor', 'keyup', throttle(function(e){
-      _e.publish('editor.typing', e)
+    _e.publish('dom.updateView', e)
+
+    _.model.saveCurrent(); // NEEDS THROTTLING
   }, 50), false);
 
-  _on('.js-new', 'click', _e.publish('dom.new'), false);
+  _on('.js-newDoc', 'click', function(e){
+    _e.publish('dom.new');
+  }, false);
 
-  // Subscribers
-  _e.subscribe('doc.new', function(){
-    _.model.create();
-  });
 }
 
 module.exports = Controller;

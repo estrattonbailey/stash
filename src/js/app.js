@@ -18,5 +18,5 @@ jQuery(function($){
 
   const stash = new Stash();
 
-  _e.publish('stash.setView');
+  _e.publish('stash.init');
 });

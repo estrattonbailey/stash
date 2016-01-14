@@ -1,48 +1,69 @@
-function Storage(){
-  var def = {
-    user: 'estrattonbailey',
-    docs: []
-  }
-  window.stash.storage = window.stash.storage || def;
-  this.setData();
-}
 /**
  * Get all stash data
  */
-Storage.prototype.getData = function(){
-  return localStorage.getItem('stash_data') ? true : false;
+function get(){
+  return localStorage.getItem('stash_data') ? _parse(localStorage.getItem('stash_data')) : false;
 }
+
 /**
  * Save all stash data
  */
-Storage.prototype.setData = function(){
-  localStorage.setItem('stash_data', _str(this.storage));
-  console.log("Stash data saved.");
+function set(){
+  localStorage.setItem('stash_data', _str(window.stash.storage));
 }
+
 /**
  * Save/create individual doc
  */
-Storage.prototype.save = function(data){
-  if (data.id){
+function save(doc){
+  if (doc.id){
     console.log("Saving a doc with an ID provided.");
-    this.storage.docs.forEach(function(doc, i){
-      if (this.storage.docs[i].id === id){
-        for (var key in data){
-          this.storage.docs[i][key] = data[key];
-        }
-      }  
-    });
+    var docs = window.stash.storage.docs;
+
+    // ONLY SAVING FIRST DOC,
+    // bc after that, the .length is > 0, 
+    // and that doc ID doesn't exist yet,
+    // so it can't be updated
+
+    if (docs.length > 0) {
+      docs.forEach(function(_doc, i){
+        if (_doc.id === doc.id){
+          for (var key in doc){
+            window.stash.storage.docs[i][key] = doc[key];
+          }
+        } 
+      });
+    } else {
+      docs.push(doc);
+    }
   } 
   else {
-    data.id = new Date().getTime();
-
     console.log("Saving a doc without an ID provided.");
-    window.stash.storage.docs.push(data);
-    this.setData();    
+    window.stash.storage.docs.push(doc);
   }
+  set();    
 }
-Storage.prototype.remove = function(id){
 
+/**
+ * Base
+ */
+function Storage(){
+  var data = {
+    user: 'estrattonbailey',
+    docs: []
+  }
+
+  window.stash.storage = get() || data;
+
+  console.log(localStorage.getItem('stash_data'))
+
+  set();
+
+  // exposed methods
+  return {
+    save: save,
+    get: get
+  }
 }
 
 module.exports = Storage;

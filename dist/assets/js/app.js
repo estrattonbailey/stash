@@ -64,7 +64,7 @@
 
 	  const stash = new Stash();
 
-	  _e.publish('stash.setView');
+	  _e.publish('stash.init');
 	});
 
 /***/ },
@@ -103,6 +103,10 @@
 
 	  window._str = function (data) {
 	    return JSON.stringify(data);
+	  };
+
+	  window._parse = function (data) {
+	    return JSON.parse(data);
 	  };
 	})();
 
@@ -272,49 +276,72 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	function Storage() {
-	  var def = {
-	    user: 'estrattonbailey',
-	    docs: []
-	  };
-	  window.stash.storage = window.stash.storage || def;
-	  this.setData();
-	}
 	/**
 	 * Get all stash data
 	 */
-	Storage.prototype.getData = function () {
-	  return localStorage.getItem('stash_data') ? true : false;
-	};
+	function get() {
+	  return localStorage.getItem('stash_data') ? _parse(localStorage.getItem('stash_data')) : false;
+	}
+
 	/**
 	 * Save all stash data
 	 */
-	Storage.prototype.setData = function () {
-	  localStorage.setItem('stash_data', _str(this.storage));
-	  console.log("Stash data saved.");
-	};
+	function set() {
+	  localStorage.setItem('stash_data', _str(window.stash.storage));
+	}
+
 	/**
 	 * Save/create individual doc
 	 */
-	Storage.prototype.save = function (data) {
-	  if (data.id) {
+	function save(doc) {
+	  if (doc.id) {
 	    console.log("Saving a doc with an ID provided.");
-	    this.storage.docs.forEach(function (doc, i) {
-	      if (this.storage.docs[i].id === id) {
-	        for (var key in data) {
-	          this.storage.docs[i][key] = data[key];
-	        }
-	      }
-	    });
-	  } else {
-	    data.id = new Date().getTime();
+	    var docs = window.stash.storage.docs;
 
+	    // ONLY SAVING FIRST DOC,
+	    // bc after that, the .length is > 0,
+	    // and that doc ID doesn't exist yet,
+	    // so it can't be updated
+
+	    if (docs.length > 0) {
+	      docs.forEach(function (_doc, i) {
+	        if (_doc.id === doc.id) {
+	          for (var key in doc) {
+	            window.stash.storage.docs[i][key] = doc[key];
+	          }
+	        }
+	      });
+	    } else {
+	      docs.push(doc);
+	    }
+	  } else {
 	    console.log("Saving a doc without an ID provided.");
-	    window.stash.storage.docs.push(data);
-	    this.setData();
+	    window.stash.storage.docs.push(doc);
 	  }
-	};
-	Storage.prototype.remove = function (id) {};
+	  set();
+	}
+
+	/**
+	 * Base
+	 */
+	function Storage() {
+	  var data = {
+	    user: 'estrattonbailey',
+	    docs: []
+	  };
+
+	  window.stash.storage = get() || data;
+
+	  console.log(localStorage.getItem('stash_data'));
+
+	  set();
+
+	  // exposed methods
+	  return {
+	    save: save,
+	    get: get
+	  };
+	}
 
 	module.exports = Storage;
 
@@ -322,9 +349,14 @@
 /* 5 */
 /***/ function(module, exports) {
 
+	function id() {
+	  return new Date().getTime();
+	}
+
 	function Model(storage) {
-	  this.storage_docs = storage.docs;
-	  this.storage = Object.getPrototypeOf(storage);
+	  this.storage = storage;
+
+	  this.editor = _s('.js-editor');
 	}
 	/**
 	 * Create a new blank doc
@@ -332,25 +364,36 @@
 	Model.prototype.create = function () {
 	  var doc = {};
 	  doc.content = '';
+	  doc.id = id();
 
-	  this.storage.save(doc);
-	  _e.publish('stash.create', doc.content);
+	  this.saveCurrent();
+
+	  _e.publish('dom.update', doc);
 	};
-	Model.prototype.read = function () {};
+
+	Model.prototype.get = function () {
+	  var storage = this.storage.get();
+	  if (storage.docs.length > 0) {
+	    _e.publish('dom.update', storage.docs[0]);
+	  } else {
+	    this.create();
+	  }
+	};
 	/**
 	 * Save a document
 	 * @param {string} content The plain text content of the editor textarea 
 	 * @param {integer} id The id of the doc to save (optional)
 	 */
-	Model.prototype.save = function (content, id) {
+	Model.prototype.saveCurrent = function () {
 	  var doc = {};
-	  doc.content = content;
 
-	  if (id) {
-	    doc.id = id;
-	  }
+	  doc.id = this.editor.getAttribute('data-id');
+	  doc.content = this.editor.value;
 
-	  this.storage.save(doc, id);
+	  // if editor is empty
+	  if (!doc.content) return;
+
+	  this.storage.save(doc);
 	};
 
 	module.exports = Model;
@@ -361,19 +404,22 @@
 
 	var marked = __webpack_require__(7);
 
-	function View() {
-	  this.view = _s('.js-view');
-
-	  _e.subscribe('stash.create', this.updateView.bind(this));
-	  _e.subscribe('dom.togglePanels', this.togglePanels.bind(this));
-	  _e.subscribe('editor.typing', this.convertToMd.bind(this));
-	  _e.subscribe('dom.new', this.newModal.bind(this));
+	function openModal() {
+	  _e.publish('stash.new');
 	}
 
-	View.prototype.updateView = function (content) {
-	  this.view.innerHTML = content;
-	};
-	View.prototype.togglePanels = function (e) {
+	function update(doc) {
+	  this.editor.value = doc.content || '';
+	  this.editor.setAttribute('data-id', doc.id || '');
+
+	  this.view.innerHTML = marked(doc.content || '');
+	}
+
+	function updateView(e) {
+	  this.view.innerHTML = marked(e.target.value);
+	}
+
+	function togglePanels(e) {
 	  if (_class.has(e.target, 'js-panel')) {
 	    var panel = e.srcElement;
 	  } else {
@@ -381,11 +427,18 @@
 	  }
 	  _class.remove(_s('.panel.is-active'), 'is-active');
 	  _class.add(panel, 'is-active');
-	};
-	View.prototype.convertToMd = function (e) {
-	  this.view.innerHTML = marked(e.target.value);
-	};
-	View.prototype.newModal = function () {};
+	}
+
+	function View() {
+	  this.view = _s('.js-view');
+	  this.editor = _s('.js-editor');
+
+	  _e.subscribe('dom.togglePanels', togglePanels);
+
+	  _e.subscribe('dom.new', openModal);
+	  _e.subscribe('dom.update', update.bind(this));
+	  _e.subscribe('dom.updateView', updateView.bind(this));
+	}
 
 	module.exports = View;
 
@@ -1692,21 +1745,28 @@
 	  _.model = model;
 	  _.view = view;
 
+	  // Subscribers
+	  _e.subscribe('stash.init', function () {
+	    _.model.get();
+	  });
+	  _e.subscribe('stash.new', function () {
+	    _.model.create();
+	  });
+
 	  // Bindings
 	  _on('.js-panel', 'click', function (e) {
 	    _e.publish('dom.togglePanels', e);
 	  }, false);
 
 	  _on('.js-editor', 'keyup', throttle(function (e) {
-	    _e.publish('editor.typing', e);
+	    _e.publish('dom.updateView', e);
+
+	    _.model.saveCurrent(); // NEEDS THROTTLING
 	  }, 50), false);
 
-	  _on('.js-new', 'click', _e.publish('dom.new'), false);
-
-	  // Subscribers
-	  _e.subscribe('doc.new', function () {
-	    _.model.create();
-	  });
+	  _on('.js-newDoc', 'click', function (e) {
+	    _e.publish('dom.new');
+	  }, false);
 	}
 
 	module.exports = Controller;

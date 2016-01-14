@@ -31,4 +31,8 @@ module.exports = (function(){
   window._str = function(data){
     return JSON.stringify(data);
   }
+
+  window._parse = function(data){
+    return JSON.parse(data);
+  }
 })();

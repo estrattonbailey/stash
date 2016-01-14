@@ -1,18 +1,21 @@
 var marked = require('marked');
 
-function View(){
-  this.view = _s('.js-view');
-
-  _e.subscribe('stash.create', this.updateView.bind(this));
-  _e.subscribe('dom.togglePanels', this.togglePanels.bind(this));
-  _e.subscribe('editor.typing', this.convertToMd.bind(this));
-  _e.subscribe('dom.new', this.newModal.bind(this));
+function openModal(){
+  _e.publish('stash.new');
 }
 
-View.prototype.updateView = function(content){
-  this.view.innerHTML = content;
+function update(doc){
+  this.editor.value = doc.content || '';
+  this.editor.setAttribute('data-id', (doc.id || ''));
+
+  this.view.innerHTML = marked(doc.content || '');
 }
-View.prototype.togglePanels = function(e){
+
+function updateView(e){
+  this.view.innerHTML = marked(e.target.value);
+}
+
+function togglePanels(e){
   if (_class.has(e.target, 'js-panel')) {
     var panel = e.srcElement; 
   } else {
@@ -21,11 +24,16 @@ View.prototype.togglePanels = function(e){
   _class.remove(_s('.panel.is-active'), 'is-active');
   _class.add(panel, 'is-active');
 }
-View.prototype.convertToMd = function(e){
-  this.view.innerHTML = marked(e.target.value);
-}
-View.prototype.newModal = function(){
-  
+
+function View(){
+  this.view = _s('.js-view');
+  this.editor = _s('.js-editor');
+
+  _e.subscribe('dom.togglePanels', togglePanels);
+
+  _e.subscribe('dom.new', openModal);
+  _e.subscribe('dom.update', update.bind(this));
+  _e.subscribe('dom.updateView', updateView.bind(this));
 }
 
 module.exports = View;

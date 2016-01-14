@@ -1,6 +1,11 @@
+function id(){
+  return new Date().getTime();
+}
+
 function Model(storage){
-  this.storage_docs = storage.docs;
-  this.storage = Object.getPrototypeOf(storage);
+  this.storage = storage;
+
+  this.editor = _s('.js-editor');
 }
 /**
  * Create a new blank doc
@@ -8,26 +13,36 @@ function Model(storage){
 Model.prototype.create = function(){
   var doc = {};
   doc.content = '';
+  doc.id = id();
 
-  this.storage.save(doc);
-  _e.publish('stash.create', doc.content);
+  this.saveCurrent();
+
+  _e.publish('dom.update', doc);
 }
-Model.prototype.read = function(){
+
+Model.prototype.get = function(){
+  var storage = this.storage.get();
+  if (storage.docs.length > 0){
+    _e.publish('dom.update', storage.docs[0]);
+  } else {
+    this.create();
+  }
 }
 /**
  * Save a document
  * @param {string} content The plain text content of the editor textarea 
  * @param {integer} id The id of the doc to save (optional)
  */
-Model.prototype.save = function(content, id){
+Model.prototype.saveCurrent = function(){
   var doc = {};
-  doc.content = content;
 
-  if (id){
-    doc.id = id;
-  }
+  doc.id = this.editor.getAttribute('data-id');
+  doc.content = this.editor.value;
 
-  this.storage.save(doc, id);
+  // if editor is empty
+  if (!doc.content) return;
+
+  this.storage.save(doc);
 }
 
 module.exports = Model;
