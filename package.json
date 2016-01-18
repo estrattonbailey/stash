@@ -24,12 +24,12 @@
     "common-js-pub-sub": "^1.0.4",
     "desandro-classie": "^1.0.1",
     "highlight.js": "^9.0.0",
+    "hogan.js": "^3.0.2",
     "lodash.throttle": "^3.0.4",
     "marked": "^0.3.5",
-    "mustache": "^2.2.1",
+    "mustache-loader": "^0.3.1",
     "sektor": "^1.1.4",
     "svbstrate": "^0.5.3",
-    "time-uuid": "^1.0.0",
     "velocity-animate": "^1.2.3"
   }
 }

@@ -1,5 +1,4 @@
 var marked = require('marked');
-var mustache = require('mustache');
 var _ = require('../lib/util');
 
 function update(doc){
@@ -23,10 +22,23 @@ function togglePanels(e){
   _class.add(panel, 'is-active');
 }
 
-function parseDocs(data){
-  var docs = []; 
+function openMenu(){
+  var menu = _.s('[data-menu]')[0];
+  if (_class.has(menu, 'is-active')) {
+    _class.remove(menu, 'is-active');
+  } else {
+    _class.add(menu, 'is-active');
+  }
+}
+
+function createDocs(data){
+  var docs = [];
+  var doclist = _s('[data-doclist]');
+  var docNodes = Array.from(_.s('[data-doc]', doclist));
+  var compiled = '';
+  var template = require('./../../templates/doc.html');
    
-  // Normalize
+      console.log(data)
   data.map(function(_doc, i){
     var d = {
       content: _doc.content,
@@ -34,20 +46,37 @@ function parseDocs(data){
     }
     docs.push(d);
   });
-  
-  var items = Array.prototype.slice.call(_sa('[data-doc]', _s('[data-menu]')));
 
-  // items.forEach(function(_item, i){
-  //   var itemId = _item.getAttribute('data-doc');
-  //   var itemContent = _s('data-contet', _item); 
-  //   docs.forEach(function(_doc, i){
-  //     if (_doc.id === id){
-  //       console.log(_doc.id);
-  //       console.log(id);
-  //       itemContent.innerHTML = _doc.content; 
-  //     }
-  //   }) 
-  // });
+  if (docNodes.length > 1){
+    update();
+  } else {
+    create();
+  }
+
+  function update(){
+    var edited;
+    var _doclist = doclist.cloneNode(true); 
+    var _docs = Array.from(_.s('[data-doc]', _doclist)); 
+
+    _docs.forEach(function(_doc, i){
+      var _id = _doc.getAttribute('data-doc');
+
+      docs.forEach(function(__doc, i){
+        if (_id === __doc.id){
+          edited = _doc
+        }
+      });
+    });
+
+    var _edited = edited.cloneNode(true); 
+    edited.remove();
+  }
+  function create(){
+    docs.forEach(function(_doc, i){
+      compiled += template(_doc); 
+    });
+    doclist.innerHTML = compiled;
+  }
 }
 
 function View(){
@@ -55,14 +84,19 @@ function View(){
   this.editor = _s('.js-editor');
 
   _e.subscribe('dom.togglePanels', togglePanels);
+  _e.subscribe('dom.openMenu', openMenu);
 
   _e.subscribe('dom.update', update.bind(this));
   _e.subscribe('dom.updateView', updateView.bind(this));
 
-  _e.subscribe('dom.updateDocs', parseDocs.bind(this));
+  _e.subscribe('dom.updateDocs', createDocs.bind(this));
 
   _on('.js-newDoc', 'click', function(){
     _e.publish('stash.new');
+  }, false);
+
+  _on('.js-menuToggle', 'click', function(){
+    _e.publish('dom.openMenu');
   }, false);
 }
 
