@@ -1515,3 +1515,35 @@ th,
   @media (min-width: 40em) {
     .editor {
       padding: 120px calc((100% - 600px)/2); } }
+
+.menu {
+  left: 25%;
+  z-index: 10;
+  overflow-y: visible;
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+  transition: -webkit-transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, -webkit-transform 0.3s ease-in-out; }
+  .menu.is-active {
+    -webkit-transform: translateX(0);
+    transform: translateX(0); }
+    .menu.is-active + .menu__overlay {
+      right: 75%;
+      opacity: 0.5;
+      visibility: visible; }
+
+.menu__overlay {
+  visibility: hidden; }
+
+.menu__inner {
+  padding: 30px 40px; }
+  @media (min-width: 50em) {
+    .menu__inner {
+      padding: 50px 70px; } }
+
+.doc {
+  border-radius: 3px; }
+
+.doc__date {
+  font-size: 0.6em; }

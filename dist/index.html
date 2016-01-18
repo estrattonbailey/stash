@@ -38,12 +38,14 @@
 </head>
 <body>
   <main class="app-container block relative h1 w1">
+
     <nav class="nav absolute px-20" role="main">
       <button class="nav__button button--ghost align-m js-menuToggle"><svg width="36" height="23" viewBox="0 0 36 23" xmlns="http://www.w3.org/2000/svg"><title>Icon - Menu</title><path d="M2.713 5.45a2.72 2.72 0 0 0 2.713-2.725A2.72 2.72 0 0 0 2.713 0 2.72 2.72 0 0 0 0 2.725 2.72 2.72 0 0 0 2.713 5.45zm0 8.775A2.72 2.72 0 0 0 5.426 11.5a2.72 2.72 0 0 0-2.713-2.725A2.72 2.72 0 0 0 0 11.5a2.72 2.72 0 0 0 2.713 2.725zm0 8.775a2.72 2.72 0 0 0 2.713-2.725 2.72 2.72 0 0 0-2.713-2.726A2.72 2.72 0 0 0 0 20.274 2.72 2.72 0 0 0 2.713 23zM8.735 0H36v5.45H8.735V0zm0 8.775H36v5.45H8.735v-5.45zm0 8.774H36V23H8.735v-5.45z" fill="#2D7CE4" fill-rule="evenodd"/></svg>
 </button>
       <span class="nav__button align-m user inline-relative pt-20 ml-20"><svg width="18" height="17" viewBox="0 0 18 17" xmlns="http://www.w3.org/2000/svg"><title>Oval 8</title><path d="M12.31 11.777c3.448.693 5.526 2.48 5.69 4.606H0c.164-2.126 2.242-3.913 5.69-4.606.995.5 2.12.783 3.31.783a7.34 7.34 0 0 0 3.31-.783zM9 11.467A5.734 5.734 0 1 0 9 0a5.734 5.734 0 0 0 0 11.468z" fill="#EDEDED" fill-rule="evenodd"/></svg>
 </span>
     </nav>
+
     <section class="panel w1 absolute is-active js-panel" data-panel="editor">
       <div class="panel__inner relative">
     
@@ -66,6 +68,18 @@
         
       </div>
     </section>
+
+    <nav class="menu absolute u-fill bg-c-theme" data-menu>
+      <div class="menu__inner relative">
+        <ul class="menu__list w1 block relative u-clear" data-doclist>
+        </ul>
+      </div>
+    </nav>
+    <div class="menu__overlay absolute u-fill bg-c-w"></div>
+    
+    <script type="text/template" id="doc">
+    </script>
+
   </main>
 </body>
 </html>

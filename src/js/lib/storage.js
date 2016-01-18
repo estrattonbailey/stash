@@ -10,37 +10,32 @@ function get(){
  */
 function set(){
   localStorage.setItem('stash_data', _str(window.stash.storage));
+  console.log('%cSaved!', 'color: #ff4567')
 }
 
 /**
  * Save/create individual doc
  */
 function save(doc){
-  if (doc.id){
-    console.log("Saving a doc with an ID provided.");
-    var docs = window.stash.storage.docs;
+  var docs = window.stash.storage.docs;
 
-    // ONLY SAVING FIRST DOC,
-    // bc after that, the .length is > 0, 
-    // and that doc ID doesn't exist yet,
-    // so it can't be updated
+  var exists = exists || false;
+  docs.map(function(_doc, i){
+    exists = _doc.id === doc.id ? true : false;
+  });
 
-    if (docs.length > 0) {
-      docs.forEach(function(_doc, i){
-        if (_doc.id === doc.id){
-          for (var key in doc){
-            window.stash.storage.docs[i][key] = doc[key];
-          }
-        } 
-      });
-    } else {
-      docs.push(doc);
-    }
-  } 
-  else {
-    console.log("Saving a doc without an ID provided.");
-    window.stash.storage.docs.push(doc);
+  if (exists){
+    docs.map(function(_doc, i, _docs){
+      if (_doc.id === doc.id){
+        for (var key in doc){
+          _docs[i][key] = doc[key];
+        }
+      } 
+    });
+  } else {
+    docs.push(doc); 
   }
+
   set();    
 }
 
@@ -54,8 +49,6 @@ function Storage(){
   }
 
   window.stash.storage = get() || data;
-
-  console.log(localStorage.getItem('stash_data'))
 
   set();
 

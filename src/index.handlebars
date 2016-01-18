@@ -38,12 +38,17 @@
 </head>
 <body>
   <main class="app-container block relative h1 w1">
+
     <nav class="nav absolute px-20" role="main">
       <button class="nav__button button--ghost align-m js-menuToggle">{{> icon-menu}}</button>
       <span class="nav__button align-m user inline-relative pt-20 ml-20">{{> icon-user}}</span>
     </nav>
+
     {{> editor}}
     {{> view}}
+
+    {{> menu}}
+
   </main>
 </body>
 </html>
