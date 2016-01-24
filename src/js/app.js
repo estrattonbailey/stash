@@ -1,4 +1,5 @@
 require('./helpers');
+var throttle = require('lodash.throttle');
 
 const Storage = require('./lib/storage');
 const Model = require('./lib/model');
@@ -6,17 +7,25 @@ const View = require('./lib/view');
 const Controller = require('./lib/controller');
 
 jQuery(function($){
-
+  const _ = this;
+    
   window.stash = window.stash || {};
 
-  function Stash(){
-    this.storage = new Storage();  
-    this.model = new Model(this.storage);  
-    this.view = new View();
-    this.controller = new Controller(this.model, this.view);  
-  }
+  this.storage = new Storage();  
+  this.model = new Model(this.storage);  
+  this.view = new View();
 
-  const stash = new Stash();
+  // INIT 
+  this.model.get()
 
-  _e.publish('stash.init');
+  // Throttle typing
+  var autosave;
+  _on('.js-editor', 'keyup', throttle(function(e){
+    _e.publish('dom.updateView', e);
+
+    clearTimeout(autosave);
+    autosave = setTimeout(function(){
+      _.model.save();
+    }, 1000);
+  }, 50), false);
 });
