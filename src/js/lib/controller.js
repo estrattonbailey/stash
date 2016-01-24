@@ -23,7 +23,7 @@ function Controller(model, view){
   // Throttle typing
   var autosave;
   _on('.js-editor', 'keyup', throttle(function(e){
-    _e.publish('dom.updateView', e)
+    _e.publish('dom.updateView', e);
 
     clearTimeout(autosave);
     autosave = setTimeout(function(){

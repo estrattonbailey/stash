@@ -32,51 +32,66 @@ function openMenu(){
 }
 
 function createDocs(data){
-  var docs = [];
-  var doclist = _s('[data-doclist]');
-  var docNodes = Array.from(_.s('[data-doc]', doclist));
-  var compiled = '';
-  var template = require('./../../templates/doc.html');
-   
-      console.log(data)
-  data.map(function(_doc, i){
-    var d = {
-      content: _doc.content,
-      id: _doc.id
-    }
-    docs.push(d);
-  });
+  var doclistClone;
+  var editedDoc;
+  var docsData = [];
+  var menu = _s('[data-menu]');
+  var doclist = _s('[data-doclist]', menu);
+  var docs = Array.from(_sa('[data-doc]', doclist));
 
-  if (docNodes.length > 1){
-    update();
-  } else {
-    create();
-  }
+  function hasDoc(){
+    var edited = null;
 
-  function update(){
-    var edited;
-    var _doclist = doclist.cloneNode(true); 
-    var _docs = Array.from(_.s('[data-doc]', _doclist)); 
+    docs.forEach(function(el){
+      var id = el.getAttribute('data-doc');
+      
+      docsData.forEach(function(d, i){
+        if (id === d.id){
+          edited = d;
 
-    _docs.forEach(function(_doc, i){
-      var _id = _doc.getAttribute('data-doc');
-
-      docs.forEach(function(__doc, i){
-        if (_id === __doc.id){
-          edited = _doc
-        }
+          el.remove();
+        } 
       });
     });
 
-    var _edited = edited.cloneNode(true); 
-    edited.remove();
+    return edited;
   }
+
+  function update(data){
+    var _template = docs[0].cloneNode(true);
+
+    _template.setAttribute('data-doc', data.id);
+    _s('[data-content]', _template).innerHTML = data.content;
+
+    doclistClone.insertBefore(_template, doclistClone.firstChild);
+  }
+
   function create(){
-    docs.forEach(function(_doc, i){
-      compiled += template(_doc); 
+    docsData.forEach(function(d){
+      update(d);  
     });
-    doclist.innerHTML = compiled;
   }
+
+  data.map(function(d){
+    var _doc = {
+      content: d.content,
+      id: d.id
+    }
+    docsData.push(_doc);
+  });
+
+  editedDoc = hasDoc(); 
+
+  if (!!editedDoc){
+    doclistClone = doclist.cloneNode(true);
+    update(editedDoc);
+  } else {
+    doclistClone = doclist.cloneNode(true);
+    create();
+  }
+
+  menu.children[0].appendChild(doclistClone);
+  doclist.remove();
 }
 
 function View(){
@@ -95,9 +110,7 @@ function View(){
     _e.publish('stash.new');
   }, false);
 
-  _on('.js-menuToggle', 'click', function(){
-    _e.publish('dom.openMenu');
-  }, false);
+  _on('.js-menuToggle', 'click', openMenu, false);
 }
 
 module.exports = View;
