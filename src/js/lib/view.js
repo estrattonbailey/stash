@@ -35,6 +35,7 @@ function createDocs(data){
   var doclistClone;
   var editedDoc;
   var docsData = [];
+
   var menu = _s('[data-menu]');
   var doclist = _s('[data-doclist]', menu);
   var docs = Array.from(_sa('[data-doc]', doclist));
@@ -57,7 +58,7 @@ function createDocs(data){
     return edited;
   }
 
-  function update(data){
+  function render(data){
     var _template = docs[0].cloneNode(true);
 
     _template.setAttribute('data-doc', data.id);
@@ -68,7 +69,7 @@ function createDocs(data){
 
   function create(){
     docsData.forEach(function(d){
-      update(d);  
+      render(d);  
     });
   }
 
@@ -84,7 +85,7 @@ function createDocs(data){
 
   if (!!editedDoc){
     doclistClone = doclist.cloneNode(true);
-    update(editedDoc);
+    render(editedDoc);
   } else {
     doclistClone = doclist.cloneNode(true);
     create();
@@ -99,11 +100,8 @@ function View(){
   this.editor = _s('.js-editor');
 
   _e.subscribe('dom.togglePanels', togglePanels);
-  _e.subscribe('dom.openMenu', openMenu);
-
   _e.subscribe('dom.update', update.bind(this));
   _e.subscribe('dom.updateView', updateView.bind(this));
-
   _e.subscribe('dom.updateDocs', createDocs.bind(this));
 
   _on('.js-newDoc', 'click', function(){
@@ -111,6 +109,7 @@ function View(){
   }, false);
 
   _on('.js-menuToggle', 'click', openMenu, false);
+  _on('.js-panel', 'click', togglePanels, false);
 }
 
 module.exports = View;

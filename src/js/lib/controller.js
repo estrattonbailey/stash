@@ -11,15 +11,6 @@ function Controller(model, view){
     _.model.get()
   });
 
-  /**
-   * BINDINGS
-   */
-
-  // Toggle which panel is active
-  _on('.js-panel', 'click', function(e){
-    _e.publish('dom.togglePanels', e);
-  }, false);
-
   // Throttle typing
   var autosave;
   _on('.js-editor', 'keyup', throttle(function(e){
