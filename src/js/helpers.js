@@ -3,7 +3,6 @@ module.exports = (function(){
 
   window._delay = function(cb, ms){
     var _timer = null;
-    console.log(cb);
     return function(){
       clearTimeout(_timer);
       _timer = setTimeout(cb, ms);

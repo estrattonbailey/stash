@@ -50,14 +50,13 @@
 	const Storage = __webpack_require__(7);
 	const Model = __webpack_require__(8);
 	const View = __webpack_require__(9);
-	const Controller = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./lib/controller\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 
-	jQuery(function ($) {
+	window.addEventListener('load', function () {
 	  const _ = this;
 
 	  window.stash = window.stash || {};
 
-	  this.storage = new Storage();
+	  this.storage = Storage();
 	  this.model = new Model(this.storage);
 	  this.view = new View();
 
@@ -85,7 +84,6 @@
 
 	  window._delay = function (cb, ms) {
 	    var _timer = null;
-	    console.log(cb);
 	    return function () {
 	      clearTimeout(_timer);
 	      _timer = setTimeout(cb, ms);

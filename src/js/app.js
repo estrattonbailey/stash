@@ -4,14 +4,13 @@ var throttle = require('lodash.throttle');
 const Storage = require('./lib/storage');
 const Model = require('./lib/model');
 const View = require('./lib/view');
-const Controller = require('./lib/controller');
 
-jQuery(function($){
+window.addEventListener('load', function(){
   const _ = this;
     
   window.stash = window.stash || {};
 
-  this.storage = new Storage();  
+  this.storage = Storage();  
   this.model = new Model(this.storage);  
   this.view = new View();
 
