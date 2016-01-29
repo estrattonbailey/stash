@@ -23,7 +23,7 @@ window.addEventListener('load', function(){
 
     clearTimeout(autosave);
     autosave = setTimeout(function(){
-      model.save();
+      _e.publish('stash.save', e);
     }, 1000);
   }, 50), false);
 }, true);

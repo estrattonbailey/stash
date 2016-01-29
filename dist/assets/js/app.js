@@ -69,7 +69,7 @@
 
 	    clearTimeout(autosave);
 	    autosave = setTimeout(function () {
-	      model.save();
+	      _e.publish('stash.save', e);
 	    }, 1000);
 	  }, 50), false);
 	}, true);
@@ -859,7 +859,6 @@
 	    _e.publish('dom.update', doc);
 	  },
 	  get: function () {
-	    console.dir(this);
 	    var storage = this.storage.get();
 	    if (storage.docs.length > 0) {
 	      _e.publish('dom.update', this.lastDoc(storage));
@@ -913,11 +912,16 @@
 	  });
 
 	  // On click of new doc button
-	  _e.subscribe('stash.new', _model.create);
+	  _e.subscribe('stash.new', function () {
+	    _model.create();
+	  });
+
+	  _e.subscribe('stash.save', function () {
+	    _model.save();
+	  });
 
 	  return {
 	    get: _model.get,
-	    save: _model.save,
 	    create: _model.create
 	  };
 	}
@@ -1047,7 +1051,6 @@
 	  if (_class.has(e.target, 'js-panel')) {
 	    var panel = e.srcElement;
 	  } else {
-	    console.dir(e.target);
 	    var panel = $(e.target).closest('.js-panel')[0];
 	  }
 	  _class.remove(_s('.panel.is-active'), 'is-active');

@@ -16,7 +16,6 @@ function togglePanels(e){
   if (_class.has(e.target, 'js-panel')) {
     var panel = e.srcElement; 
   } else {
-    console.dir(e.target)
     var panel = $(e.target).closest('.js-panel')[0];
   }
   _class.remove(_s('.panel.is-active'), 'is-active');

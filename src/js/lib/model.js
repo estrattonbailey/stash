@@ -14,7 +14,6 @@ var proto = {
     _e.publish('dom.update', doc);
   },
   get: function(){
-    console.dir(this)
     var storage = this.storage.get();
     if (storage.docs.length > 0){
       _e.publish('dom.update', this.lastDoc(storage));
@@ -68,11 +67,16 @@ function Model(storage){
   });
   
   // On click of new doc button
-  _e.subscribe('stash.new', _model.create); 
+  _e.subscribe('stash.new', function(){
+    _model.create()
+  }); 
+
+  _e.subscribe('stash.save', function(){
+    _model.save()
+  }); 
 
   return {
     get: _model.get,
-    save: _model.save,
     create: _model.create
   }
 }
