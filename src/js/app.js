@@ -10,21 +10,20 @@ window.addEventListener('load', function(){
     
   window.stash = window.stash || {};
 
-  this.storage = Storage();  
-  this.model = new Model(this.storage);  
-  this.view = new View();
+  storage = Storage();  
+  model = Model(this.storage);  
+  view = new View();
 
   // INIT 
-  this.model.get()
+  _e.publish('app.init');
 
-  // Throttle typing
   var autosave;
   _on('.js-editor', 'keyup', throttle(function(e){
     _e.publish('dom.updateView', e);
 
     clearTimeout(autosave);
     autosave = setTimeout(function(){
-      _.model.save();
+      model.save();
     }, 1000);
   }, 50), false);
 }, true);

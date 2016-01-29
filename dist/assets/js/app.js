@@ -49,28 +49,27 @@
 
 	const Storage = __webpack_require__(7);
 	const Model = __webpack_require__(8);
-	const View = __webpack_require__(9);
+	const View = __webpack_require__(10);
 
 	window.addEventListener('load', function () {
 	  const _ = this;
 
 	  window.stash = window.stash || {};
 
-	  this.storage = Storage();
-	  this.model = new Model(this.storage);
-	  this.view = new View();
+	  storage = Storage();
+	  model = Model(this.storage);
+	  view = new View();
 
 	  // INIT
-	  this.model.get();
+	  _e.publish('app.init');
 
-	  // Throttle typing
 	  var autosave;
 	  _on('.js-editor', 'keyup', throttle(function (e) {
 	    _e.publish('dom.updateView', e);
 
 	    clearTimeout(autosave);
 	    autosave = setTimeout(function () {
-	      _.model.save();
+	      model.save();
 	    }, 1000);
 	  }, 50), false);
 	}, true);
@@ -842,78 +841,85 @@
 
 /***/ },
 /* 8 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	function id() {
-	  return new Date().getTime();
-	}
+	const $ = __webpack_require__(9);
 
-	function last(storage) {
-	  var last,
-	      id = 0;
-	  storage.docs.forEach(function (_doc, i) {
-	    id = Math.max(id, _doc.id);
-	  });
-	  storage.docs.forEach(function (_doc) {
-	    if (id === parseInt(_doc.id, 10)) {
-	      last = _doc;
+	var proto = {
+	  returnId: function () {
+	    return new Date().getTime();
+	  },
+	  create: function () {
+	    var doc = {};
+	    doc.content = '';
+	    doc.id = this.returnId();
+
+	    this.save();
+
+	    _e.publish('dom.update', doc);
+	  },
+	  get: function () {
+	    console.dir(this);
+	    var storage = this.storage.get();
+	    if (storage.docs.length > 0) {
+	      _e.publish('dom.update', this.lastDoc(storage));
+	      _e.publish('dom.updateDocs', storage.docs);
+	    } else {
+	      this.create();
 	    }
-	  });
-	  return last;
-	}
+	  },
+	  save: function () {
+	    var doc = {};
+	    var docs = [];
 
-	/**
-	 * Create a new blank doc
-	 */
-	function create() {
-	  var doc = {};
-	  doc.content = '';
-	  doc.id = id();
+	    doc.id = this.editor.getAttribute('data-id');
+	    doc.content = this.editor.value;
 
-	  this.save();
+	    docs.push(doc);
 
-	  _e.publish('dom.update', doc);
-	}
+	    // if editor is empty
+	    if (!doc.content) return;
 
-	function get() {
-	  var storage = this.storage.get();
-	  if (storage.docs.length > 0) {
-	    _e.publish('dom.update', last(storage));
-	    _e.publish('dom.updateDocs', storage.docs);
-	  } else {
-	    this.create();
+	    _e.publish('dom.updateDocs', docs);
+	    this.storage.save(doc);
+	  },
+	  lastDoc: function (storage) {
+	    var last,
+	        id = 0;
+	    storage.docs.forEach(function (_doc, i) {
+	      id = Math.max(id, _doc.id);
+	    });
+	    storage.docs.forEach(function (_doc) {
+	      if (id === parseInt(_doc.id, 10)) {
+	        last = _doc;
+	      }
+	    });
+	    return last;
 	  }
-	}
-	/**
-	 * Save a document
-	 */
-	function save() {
-	  var doc = {};
-	  var docs = [];
-
-	  doc.id = this.editor.getAttribute('data-id');
-	  doc.content = this.editor.value;
-
-	  docs.push(doc);
-
-	  // if editor is empty
-	  if (!doc.content) return;
-
-	  _e.publish('dom.updateDocs', docs);
-	  this.storage.save(doc);
-	}
+	};
 
 	function Model(storage) {
-	  this.storage = storage;
+	  var _model = Object.create(proto, {
+	    storage: {
+	      value: storage
+	    },
+	    editor: {
+	      value: $('.js-editor')[0]
+	    }
+	  });
 
-	  this.editor = _s('.js-editor');
-
-	  this.save = save;
-	  this.create = create;
-	  this.get = get;
+	  _e.subscribe('app.init', function () {
+	    _model.get();
+	  });
 
 	  // On click of new doc button
-	  _e.subscribe('stash.new', this.create.bind(this));
+	  _e.subscribe('stash.new', _model.create);
+
+	  return {
+	    get: _model.get,
+	    save: _model.save,
+	    create: _model.create
+	  };
 	}
 
 	module.exports = Model;
@@ -922,7 +928,108 @@
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(10);
+	(function(f){if(true){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.index || (g.index = {})).js = f()}})(function(){var define,module,exports;
+	var del = document.documentElement || {};
+	var _match = (del.matches || del.webkitMatchesSelector || del.mozMatchesSelector || del.oMatchesSelector || del.msMatchesSelector || function(){return false;});
+
+	var proto = {
+		find: function(selector){
+			return Select(selector, this.context)
+		},
+		next: function(selector){
+			return Select(selector, this.context)
+		},
+		closest: function(selector){
+			var context = this.context,
+					search = context,
+					nodes = [];
+			
+			for (; search;) {
+			 	search = search.parentNode;
+				
+				if (search === document){
+					return context;
+				}
+				
+				var match = _match.call(search, selector) ? search : false;
+				
+				if (match){
+					nodes.push(match);
+					return _bundle(nodes);
+				}
+			}
+		},
+		siblings: function(selector){
+			var context = this.context;
+			var siblings = _array(context.parentNode.children);
+			var nodes = [];
+			
+			if (selector){
+				siblings.forEach(function(sib, i){
+					if (sib !== context) {
+						var match = _match.call(sib, selector) ? sib : false;
+						if (match){
+							nodes.push(match)
+						}
+					}
+				});
+			} else {
+				siblings.forEach(function(sib, i){
+					if (sib !== context) {
+						nodes.push(sib)
+					}
+				});
+			}
+			
+			return _bundle(nodes);
+		}
+	}
+
+	function _array(nodelist){
+		return Array.prototype.slice.call(nodelist);
+	}
+
+	function _bundle(nodes){	
+		var select;
+		
+		select = Object.create(proto);
+		select.context = nodes[0];	
+		select.length = nodes.length;
+		
+		nodes.forEach(function(n, i){
+			select[i] = n;
+		});
+		
+		return select;
+	}
+
+	function Select(selector, scope){
+		var query,
+				nodes = [];
+		
+	  if (selector.nodeType && selector.nodeType === 1){
+	    nodes.push(selector);
+	  } else {
+	    query = (scope || document).querySelectorAll(selector)
+	    
+	    if (!query) return nodes && console.log('Bad selector '+selector+'. Not found.');
+	    
+	    nodes = _array(query);
+	  }
+
+		return _bundle(nodes);
+	}
+
+	return Select;
+
+	});
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(9);
 	var marked = __webpack_require__(11);
 
 	function update(doc) {
@@ -940,6 +1047,7 @@
 	  if (_class.has(e.target, 'js-panel')) {
 	    var panel = e.srcElement;
 	  } else {
+	    console.dir(e.target);
 	    var panel = $(e.target).closest('.js-panel')[0];
 	  }
 	  _class.remove(_s('.panel.is-active'), 'is-active');
@@ -1037,13 +1145,6 @@
 	}
 
 	module.exports = View;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	(function(f){if(true){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.index||(g.index={})).js=f()}})(function(){var define,module,exports;var del=document.documentElement||{};var _match=del.matches||del.webkitMatchesSelector||del.mozMatchesSelector||del.oMatchesSelector||del.msMatchesSelector||function(){return false};var proto={find:function(selector){return Select(selector,this.context)},next:function(selector){return Select(selector,this.context)},closest:function(selector){var context=this.context,search=context,nodes=[];for(;search;){search=search.parentNode;if(search===document){return context}var match=_match.call(search,selector)?search:false;if(match){nodes.push(match);return _bundle(nodes)}}},siblings:function(selector){var context=this.context;var siblings=_array(context.parentNode.children);var nodes=[];if(selector){siblings.forEach(function(sib,i){if(sib!==context){var match=_match.call(sib,selector)?sib:false;if(match){nodes.push(match)}}})}else{siblings.forEach(function(sib,i){if(sib!==context){nodes.push(sib)}})}return _bundle(nodes)}};function _array(nodelist){return Array.prototype.slice.call(nodelist)}function _bundle(nodes){var select;select=Object.create(proto);select.context=nodes[0];select.length=nodes.length;nodes.forEach(function(n,i){select[i]=n});return select}function Select(selector,scope){var query,nodes=[];if(typeof selector!=="string"){return nodes}query=(scope||document).querySelectorAll(selector);if(!query)return nodes&&console.log("Bad selector "+selector+". Not found.");nodes=_array(query);return _bundle(nodes)}return Select});
-
 
 /***/ },
 /* 11 */

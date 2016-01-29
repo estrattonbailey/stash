@@ -1,73 +1,80 @@
-function id(){
-  return new Date().getTime();
-}
+const $ = require('nab-select');
 
-function last(storage){
-  var last,
-      id = 0;
-  storage.docs.forEach(function(_doc, i){
-    id = Math.max(id, _doc.id);
-  });
-  storage.docs.forEach(function(_doc){
-    if (id === parseInt(_doc.id, 10)) {
-      last = _doc;
+var proto = {
+  returnId: function(){
+    return new Date().getTime();
+  },
+  create: function(){
+    var doc = {};
+    doc.content = '';
+    doc.id = this.returnId();
+
+    this.save();
+
+    _e.publish('dom.update', doc);
+  },
+  get: function(){
+    console.dir(this)
+    var storage = this.storage.get();
+    if (storage.docs.length > 0){
+      _e.publish('dom.update', this.lastDoc(storage));
+      _e.publish('dom.updateDocs', storage.docs);
+    } else {
+      this.create();
     }
-  });
-  return last;
-}
+  },
+  save: function(){
+    var doc = {};
+    var docs = [];
 
-/**
- * Create a new blank doc
- */
-function create(){
-  var doc = {};
-  doc.content = '';
-  doc.id = id();
+    doc.id = this.editor.getAttribute('data-id');
+    doc.content = this.editor.value;
 
-  this.save();
+    docs.push(doc);
 
-  _e.publish('dom.update', doc);
-}
+    // if editor is empty
+    if (!doc.content) return;
 
-function get(){
-  var storage = this.storage.get();
-  if (storage.docs.length > 0){
-    _e.publish('dom.update', last(storage));
-    _e.publish('dom.updateDocs', storage.docs);
-  } else {
-    this.create();
+    _e.publish('dom.updateDocs', docs);
+    this.storage.save(doc);
+  },
+  lastDoc: function(storage){
+    var last,
+        id = 0;
+    storage.docs.forEach(function(_doc, i){
+      id = Math.max(id, _doc.id);
+    });
+    storage.docs.forEach(function(_doc){
+      if (id === parseInt(_doc.id, 10)) {
+        last = _doc;
+      }
+    });
+    return last;
   }
-}
-/**
- * Save a document
- */
-function save(){
-  var doc = {};
-  var docs = [];
-
-  doc.id = this.editor.getAttribute('data-id');
-  doc.content = this.editor.value;
-
-  docs.push(doc);
-
-  // if editor is empty
-  if (!doc.content) return;
-
-  _e.publish('dom.updateDocs', docs);
-  this.storage.save(doc);
 }
 
 function Model(storage){
-  this.storage = storage;
+  var _model = Object.create(proto, {
+    storage: {
+      value: storage
+    },
+    editor: {
+      value: $('.js-editor')[0]
+    }
+  });
 
-  this.editor = _s('.js-editor');
-
-  this.save = save;
-  this.create = create;
-  this.get = get;
-
+  _e.subscribe('app.init', function(){
+    _model.get()
+  });
+  
   // On click of new doc button
-  _e.subscribe('stash.new', this.create.bind(this)); 
+  _e.subscribe('stash.new', _model.create); 
+
+  return {
+    get: _model.get,
+    save: _model.save,
+    create: _model.create
+  }
 }
 
 module.exports = Model;
