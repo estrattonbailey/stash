@@ -1,5 +1,5 @@
+var $ = require('nab-select');
 var marked = require('marked');
-var _ = require('../lib/util');
 
 function update(doc){
   this.editor.value = doc.content || '';
@@ -23,7 +23,7 @@ function togglePanels(e){
 }
 
 function openMenu(){
-  var menu = _.s('[data-menu]')[0];
+  var menu = $('[data-menu]')[0];
   if (_class.has(menu, 'is-active')) {
     _class.remove(menu, 'is-active');
   } else {

@@ -27,4 +27,4 @@ window.addEventListener('load', function(){
       _.model.save();
     }, 1000);
   }, 50), false);
-});
+}, true);
