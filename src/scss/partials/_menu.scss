@@ -1,4 +1,6 @@
 .menu {
+  background-color: rgba($c-g1, 0.9);
+  border-left: 1px solid $c-g1;
   left: 25%;
   z-index: 10;
   overflow-y: visible;
@@ -10,10 +12,13 @@
   
     & + .menu__overlay {
       right: 75%;
-      opacity: 0.5;
+      // opacity: 0.5;
       visibility: visible;
     }
   }
+}
+.menu__bg {
+  opacity: 0.9;
 }
 .menu__overlay {
   visibility: hidden;
@@ -26,10 +31,17 @@
 }
 
 .doc {
-  border-radius: 3px;
-
   &.template {
     display: none;
+  }
+}
+.doc__inner {
+  border-radius: 3px;
+  border: 1px solid $c-g1;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $c-g2;
   }
 }
 .doc__date {

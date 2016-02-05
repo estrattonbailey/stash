@@ -628,6 +628,56 @@ html, html a {
 .px-4 {
   padding: 4px; }
 
+.mt-6 {
+  margin-top: 6px; }
+
+.mb-6 {
+  margin-bottom: 6px; }
+
+.mv-6 {
+  margin-top: 6px;
+  margin-bottom: 6px; }
+
+.ml-6 {
+  margin-left: 6px; }
+
+.mr-6 {
+  margin-right: 6px; }
+
+.mh-6 {
+  margin-left: 6px;
+  margin-right: 6px; }
+
+.mhn-6 {
+  margin-left: -2px;
+  margin-right: -2px; }
+
+.mx-6 {
+  margin: 6px; }
+
+.pt-6 {
+  padding-top: 6px; }
+
+.pb-6 {
+  padding-bottom: 6px; }
+
+.pv-6 {
+  padding-top: 6px;
+  padding-bottom: 6px; }
+
+.pl-6 {
+  padding-left: 6px; }
+
+.pr-6 {
+  padding-right: 6px; }
+
+.ph-6 {
+  padding-left: 6px;
+  padding-right: 6px; }
+
+.px-6 {
+  padding: 6px; }
+
 .mt-8 {
   margin-top: 8px; }
 
@@ -1517,6 +1567,8 @@ th,
       padding: 120px calc((100% - 600px)/2); } }
 
 .menu {
+  background-color: rgba(245, 245, 245, 0.9);
+  border-left: 1px solid #f5f5f5;
   left: 25%;
   z-index: 10;
   overflow-y: visible;
@@ -1530,8 +1582,10 @@ th,
     transform: translateX(0); }
     .menu.is-active + .menu__overlay {
       right: 75%;
-      opacity: 0.5;
       visibility: visible; }
+
+.menu__bg {
+  opacity: 0.9; }
 
 .menu__overlay {
   visibility: hidden; }
@@ -1542,10 +1596,15 @@ th,
     .menu__inner {
       padding: 50px 70px; } }
 
-.doc {
-  border-radius: 3px; }
-  .doc.template {
-    display: none; }
+.doc.template {
+  display: none; }
+
+.doc__inner {
+  border-radius: 3px;
+  border: 1px solid #f5f5f5;
+  cursor: pointer; }
+  .doc__inner:hover {
+    border-color: #cccccc; }
 
 .doc__date {
   font-size: 0.6em; }
