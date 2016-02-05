@@ -47,8 +47,10 @@
 	__webpack_require__(1);
 	var throttle = __webpack_require__(4);
 
-	const Storage = __webpack_require__(7);
-	const Model = __webpack_require__(8);
+	const $ = __webpack_require__(7);
+
+	const Storage = __webpack_require__(8);
+	const Model = __webpack_require__(9);
 	const View = __webpack_require__(10);
 
 	window.addEventListener('load', function () {
@@ -57,11 +59,17 @@
 	  window.stash = window.stash || {};
 
 	  storage = Storage();
-	  model = Model(this.storage);
+	  model = Model(storage);
 	  view = new View();
 
 	  // INIT
 	  _e.publish('app.init');
+
+	  _on('[data-menu]', 'click', function (e) {
+	    var doc = $(e.target).closest('[data-doc]'),
+	        id = doc[0].getAttribute('data-doc');
+	    storage.read(id);
+	  }, false);
 
 	  var autosave;
 	  _on('.js-editor', 'keyup', throttle(function (e) {
@@ -774,162 +782,6 @@
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
-
-	/**
-	 * Get all stash data
-	 */
-	function get() {
-	  return localStorage.getItem('stash_data') ? _parse(localStorage.getItem('stash_data')) : false;
-	}
-
-	/**
-	 * Save all stash data
-	 */
-	function set() {
-	  localStorage.setItem('stash_data', _str(window.stash.storage));
-	  console.log('%cSaved!', 'color: #ff4567');
-	}
-
-	/**
-	 * Save/create individual doc
-	 */
-	function save(doc) {
-	  var docs = window.stash.storage.docs;
-
-	  var exists = exists || false;
-	  docs.map(function (_doc, i) {
-	    exists = _doc.id === doc.id ? true : false;
-	  });
-
-	  if (exists) {
-	    docs.map(function (_doc, i, _docs) {
-	      if (_doc.id === doc.id) {
-	        for (var key in doc) {
-	          _docs[i][key] = doc[key];
-	        }
-	      }
-	    });
-	  } else {
-	    docs.push(doc);
-	  }
-
-	  set();
-	}
-
-	/**
-	 * Base
-	 */
-	function Storage() {
-	  var data = {
-	    user: 'estrattonbailey',
-	    docs: []
-	  };
-
-	  window.stash.storage = get() || data;
-
-	  set();
-
-	  // exposed methods
-	  return {
-	    save: save,
-	    get: get
-	  };
-	}
-
-	module.exports = Storage;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	const $ = __webpack_require__(9);
-
-	var proto = {
-	  returnId: function () {
-	    return new Date().getTime();
-	  },
-	  create: function () {
-	    var doc = {};
-	    doc.content = '';
-	    doc.id = this.returnId();
-
-	    this.save();
-
-	    _e.publish('dom.update', doc);
-	  },
-	  get: function () {
-	    var storage = this.storage.get();
-	    if (storage.docs.length > 0) {
-	      _e.publish('dom.update', this.lastDoc(storage));
-	      _e.publish('dom.updateDocs', storage.docs);
-	    } else {
-	      this.create();
-	    }
-	  },
-	  save: function () {
-	    var doc = {};
-	    var docs = [];
-
-	    doc.id = this.editor.getAttribute('data-id');
-	    doc.content = this.editor.value;
-
-	    docs.push(doc);
-
-	    // if editor is empty
-	    if (!doc.content) return;
-
-	    _e.publish('dom.updateDocs', docs);
-	    this.storage.save(doc);
-	  },
-	  lastDoc: function (storage) {
-	    var last,
-	        id = 0;
-	    storage.docs.forEach(function (_doc, i) {
-	      id = Math.max(id, _doc.id);
-	    });
-	    storage.docs.forEach(function (_doc) {
-	      if (id === parseInt(_doc.id, 10)) {
-	        last = _doc;
-	      }
-	    });
-	    return last;
-	  }
-	};
-
-	function Model(storage) {
-	  var _model = Object.create(proto, {
-	    storage: {
-	      value: storage
-	    },
-	    editor: {
-	      value: $('.js-editor')[0]
-	    }
-	  });
-
-	  _e.subscribe('app.init', function () {
-	    _model.get();
-	  });
-
-	  // On click of new doc button
-	  _e.subscribe('stash.new', function () {
-	    _model.create();
-	  });
-
-	  _e.subscribe('stash.save', function () {
-	    _model.save();
-	  });
-
-	  return {
-	    get: _model.get,
-	    create: _model.create
-	  };
-	}
-
-	module.exports = Model;
-
-/***/ },
-/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function(f){if(true){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.index || (g.index = {})).js = f()}})(function(){var define,module,exports;
@@ -1030,10 +882,190 @@
 
 
 /***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	/**
+	 * Get all stash data
+	 */
+	function get() {
+	  return localStorage.getItem('stash_data') ? _parse(localStorage.getItem('stash_data')) : false;
+	}
+
+	function getDoc(id) {
+	  console.log(id);
+	  var doc,
+	      docs = window.stash.storage.docs;
+
+	  docs.map(function (_doc, i) {
+	    if (_doc.id === id) {
+	      doc = _doc;
+	    }
+	  });
+
+	  _e.publish('dom.update', doc);
+
+	  return doc;
+	}
+
+	/**
+	 * Save all stash data
+	 */
+	function set() {
+	  localStorage.setItem('stash_data', _str(window.stash.storage));
+	  console.log('%cSaved!', 'color: #ff4567');
+	}
+
+	/**
+	 * Save/create individual doc
+	 */
+	function save(doc) {
+	  var docs = window.stash.storage.docs;
+
+	  var exists = exists || false;
+	  docs.map(function (_doc, i) {
+	    exists = _doc.id === doc.id ? true : false;
+	  });
+
+	  if (exists) {
+	    docs.map(function (_doc, i, _docs) {
+	      if (_doc.id === doc.id) {
+	        for (var key in doc) {
+	          _docs[i][key] = doc[key];
+	        }
+	      }
+	    });
+	  } else {
+	    docs.push(doc);
+	  }
+
+	  set();
+	}
+
+	/**
+	 * Base
+	 */
+	function Storage() {
+	  var data = {
+	    user: 'estrattonbailey',
+	    docs: []
+	  };
+
+	  window.stash.storage = get() || data;
+
+	  set();
+
+	  // exposed methods
+	  return {
+	    save: save,
+	    get: get,
+	    read: getDoc
+	  };
+	}
+
+	module.exports = Storage;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const $ = __webpack_require__(7);
+
+	var proto = {
+	  returnId: function () {
+	    return new Date().getTime();
+	  },
+	  read: function (id) {
+	    console.dir(this);
+	    var doc = this.storage.read(id);
+
+	    _e.publish('dom.update', doc);
+	  },
+	  create: function () {
+	    var doc = {};
+	    doc.content = '';
+	    doc.id = this.returnId();
+
+	    this.save();
+
+	    _e.publish('dom.update', doc);
+	  },
+	  get: function () {
+	    var storage = this.storage.get();
+	    if (storage.docs.length > 0) {
+	      _e.publish('dom.update', this.lastDoc(storage));
+	      _e.publish('dom.updateDocs', storage.docs);
+	    } else {
+	      this.create();
+	    }
+	  },
+	  save: function () {
+	    var doc = {};
+	    var docs = [];
+
+	    doc.id = this.editor.getAttribute('data-id');
+	    doc.content = this.editor.value;
+
+	    docs.push(doc);
+
+	    // if editor is empty
+	    if (!doc.content) return;
+
+	    _e.publish('dom.updateDocs', docs);
+	    this.storage.save(doc);
+	  },
+	  lastDoc: function (storage) {
+	    var last,
+	        id = 0;
+	    storage.docs.forEach(function (_doc, i) {
+	      id = Math.max(id, _doc.id);
+	    });
+	    storage.docs.forEach(function (_doc) {
+	      if (id === parseInt(_doc.id, 10)) {
+	        last = _doc;
+	      }
+	    });
+	    return last;
+	  }
+	};
+
+	function Model(storage) {
+	  var _model = Object.create(proto, {
+	    storage: {
+	      value: storage
+	    },
+	    editor: {
+	      value: $('.js-editor')[0]
+	    }
+	  });
+
+	  _e.subscribe('app.init', function () {
+	    _model.get();
+	  });
+
+	  // On click of new doc button
+	  _e.subscribe('stash.new', function () {
+	    _model.create();
+	  });
+
+	  _e.subscribe('stash.save', function () {
+	    _model.save();
+	  });
+
+	  return {
+	    get: _model.get,
+	    create: _model.create,
+	    read: _model.read
+	  };
+	}
+
+	module.exports = Model;
+
+/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(9);
+	var $ = __webpack_require__(7);
 	var marked = __webpack_require__(11);
 
 	function update(doc) {

@@ -5,6 +5,22 @@ function get(){
   return localStorage.getItem('stash_data') ? _parse(localStorage.getItem('stash_data')) : false;
 }
 
+function getDoc(id){
+  console.log(id)
+  var doc,
+      docs = window.stash.storage.docs;
+
+  docs.map(function(_doc, i){
+    if (_doc.id === id){
+      doc = _doc
+    }
+  });
+     
+  _e.publish('dom.update', doc);
+
+  return doc;
+}
+
 /**
  * Save all stash data
  */
@@ -55,7 +71,8 @@ function Storage(){
   // exposed methods
   return {
     save: save,
-    get: get
+    get: get,
+    read: getDoc
   }
 }
 

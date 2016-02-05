@@ -4,6 +4,12 @@ var proto = {
   returnId: function(){
     return new Date().getTime();
   },
+  read: function(id){
+    console.dir(this)
+    var doc = this.storage.read(id);         
+     
+    _e.publish('dom.update', doc);
+  },
   create: function(){
     var doc = {};
     doc.content = '';
@@ -77,7 +83,8 @@ function Model(storage){
 
   return {
     get: _model.get,
-    create: _model.create
+    create: _model.create,
+    read: _model.read
   }
 }
 
