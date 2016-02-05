@@ -61,6 +61,8 @@ function createDocs(data){
   function render(data){
     var _template = docs[0].cloneNode(true);
 
+    _class.remove(_template, 'template'); 
+
     _template.setAttribute('data-doc', data.id);
     _s('[data-content]', _template).innerHTML = data.content;
 

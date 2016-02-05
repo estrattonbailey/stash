@@ -1544,6 +1544,8 @@ th,
 
 .doc {
   border-radius: 3px; }
+  .doc.template {
+    display: none; }
 
 .doc__date {
   font-size: 0.6em; }
