@@ -1,0 +1,63 @@
+html,
+body {
+  font-size: 120%;
+}
+body {
+  padding: 3em;
+}
+input[type="radio"] {
+  position: absolute;
+  visibility: hidden;
+  max-width: 100%;
+  letter-spacing: 0.2em;
+}
+label {
+  color: gray;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+input[type="radio"]:checked + label {
+  color: black;
+}
+input[value="edit"]:checked ~ #edit {
+  display: block;
+}
+input[value="preview"]:checked ~ #preview {
+  display: block;
+}
+
+#edit {
+  appearance: none;
+  --webkit-appearance: none;
+  border: 0;
+  outline: 0;
+  resize: none;
+  font: inherit;
+}
+#edit,
+#preview {
+  display: none;
+  padding: 3em 0;
+}
+#preview.is-static {
+  display: block;
+}
+
+
+#home,
+#copy,
+#share {
+  color: gray;
+  cursor: pointer;
+  font-size: 0.75rem;
+  background: none;
+  line-height: 1.6;
+}
+#home:hover,
+#copy:hover,
+#share:hover {
+  color: black;
+}
+#copy {
+  display: none;
+}
