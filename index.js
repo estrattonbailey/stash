@@ -6,7 +6,7 @@ const ms = require('ms')
 const uid = require('uid')
 const { json } = require('body-parser')
 const admin = require('firebase-admin')
-const snarkdown = require('snarkdown')
+const marked = require('marked')
 const serviceAccount = require('./serviceAccountKey.json')
 
 const { NODE_ENV } = process.env
@@ -101,25 +101,32 @@ function template ({ id, content }) {
     <title>stash</title>
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/svbstrate" />
     <link rel="stylesheet" type="text/css" href="/main.css" />
-    <script src="https://unpkg.com/snarkdown@1.2.2/dist/snarkdown.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://unpkg.com/unfetch@3.0.0/dist/unfetch.umd.js"></script>
     <script src="/index.js"></script>
   </head>
   <body>
-    <div class='rel f aic fw'>
+    <div class='rel f aic fw x mxa'>
       ${!id ? (
         `<input id='editToggle' type='radio' name='view' value='edit' checked />
-        <label for='editToggle' class='inline-block mr1 caps'>Edit</label>
+        <label for='editToggle' class='nav-link inline-block mr1 caps'>Edit</label>
         <input id='previewToggle' type='radio' name='view' value='preview' />
-        <label for='previewToggle' class='inline-block mr1 caps'>Preview</label>
+        <label for='previewToggle' class='nav-link inline-block mr1 caps'>Preview</label>
 
-        <button id='share' class='abs top right caps'>SHARE</button>
-        <button id='copy' class='abs top right'>⇢ CLICK TO COPY</button>
+        <button id='share' class='nav-link abs top right caps'>SHARE</button>
+        <button id='copy' class='nav-link abs top right'>⇢ CLICK TO COPY</button>
 
-        <textarea id='edit' class='block x y'>${content || 'Write something'}</textarea>`
-      ) : ''}
+        <div class='x'></div>
+
+        <textarea id='edit' class='nav-link block x y'>${content || 'Write something'}</textarea>`
+      ) : (
+        `<a href='?edit' class='caps nav-link'>Edit this stash</a>`
+      )}
+
+      <div class='x'></div>
+
       <div id='preview' class='block x y${id ? ' is-static': ''}'>
-        ${content ? snarkdown(content) : 'Write something'}
+        ${content ? marked(content) : 'Write something'}
       </div>
     </div>
   </body>

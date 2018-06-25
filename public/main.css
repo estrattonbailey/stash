@@ -1,9 +1,9 @@
 html,
 body {
-  font-size: 120%;
+  color: #333;
 }
 body {
-  padding: 3em;
+  padding: 1.5em;
 }
 input[type="radio"] {
   position: absolute;
@@ -33,31 +33,81 @@ input[value="preview"]:checked ~ #preview {
   outline: 0;
   resize: none;
   font: inherit;
+  overflow: hidden;
+  min-height: 100vh;
 }
 #edit,
 #preview {
   display: none;
-  padding: 3em 0;
+  padding: 1.5em 0;
+  max-width: 45em;
 }
 #preview.is-static {
   display: block;
 }
 
 
-#home,
-#copy,
-#share {
+.nav-link {
   color: gray;
   cursor: pointer;
   font-size: 0.75rem;
   background: none;
   line-height: 1.6;
+  text-decoration: none;
 }
-#home:hover,
-#copy:hover,
-#share:hover {
+.nav-link:hover {
   color: black;
 }
 #copy {
   display: none;
+}
+
+@media (min-width: 800px) {
+  body {
+    padding: 3em;
+  }
+  #edit,
+  #preview {
+    padding: 3em 0;
+  }
+}
+
+blockquote {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding-left: 2em;
+  margin: 1em 0;
+}
+ol {
+  list-style: decimal;
+}
+ul {
+  list-style: disc;
+}
+
+ol ol,
+ul ol {
+  list-style-type: lower-roman;
+}
+
+ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+  list-style-type: lower-alpha;
+}
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  background: whitesmoke;
+}
+pre {
+  margin: 2em 0;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  background: whitesmoke;
+  padding: 1em 2em;
+  overflow: auto;
+  max-width: 100%;
 }
